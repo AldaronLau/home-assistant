@@ -1,4 +1,4 @@
-"""ThingBits Binary Sensors."""
+"""ThingBits Sensors."""
 
 import thingbits_ha
 
@@ -13,16 +13,12 @@ from .const import DOMAIN
 SIGNAL_UPDATE_ENTITY = "thingbits_{}"
 
 
-def send_event(device_id, hass, data):
+def send_event(device_id, user_data, data):
     """Send event to HomeAssistant from thingbits_ha (callback)."""
 
+    hass, sensor = user_data
+    sensor.value = data
     async_dispatcher_send(hass, SIGNAL_UPDATE_ENTITY.format(device_id))
-
-    # event_data = {
-    #    "device_id": device_id,
-    #    "type": data,
-    # }
-    # hass.bus.async_fire("thingbits_event", event_data)
 
 
 async def async_setup_entry(hass, config, async_add_entities):
@@ -32,8 +28,9 @@ async def async_setup_entry(hass, config, async_add_entities):
     entities = []
     for device in devices:
         if device["type"] in thingbits.SENSOR_TYPES:
-            entities.append(Sensor(device))
-            thingbits_ha.listen(device["id"], hass, send_event)
+            sensor = Sensor(device)
+            entities.append(sensor)
+            thingbits_ha.listen(device["id"], (hass, sensor), send_event)
 
     async_add_entities(entities)
 
@@ -46,6 +43,7 @@ class Sensor(SensorEntity):
         self.data = data
         self._state = None
         self._remove_signal_update = None
+        self.value = None
 
     async def async_added_to_hass(self):
         """Call when entity is added to hass."""
@@ -69,10 +67,15 @@ class Sensor(SensorEntity):
         """Return the name of the sensor."""
         return self.data["name"]
 
+    @property
+    def state(self):
+        """Get the state of the sensor."""
+        return self._state
+
     async def async_update(self):
         """Update sensor state."""
-        print("updating")
-        self._state = not self._state  # await async_fetch_state()
+        print("updating value")
+        self._state = self.value
 
     def _update_callback(self):
         """Call update method."""

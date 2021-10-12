@@ -13,16 +13,12 @@ from .const import DOMAIN
 SIGNAL_UPDATE_ENTITY = "thingbits_{}"
 
 
-def send_event(device_id, hass, data):
+def send_event(device_id, user_data, data):
     """Send event to HomeAssistant from thingbits_ha (callback)."""
 
+    hass, sensor = user_data
+    sensor.value = not sensor.value
     async_dispatcher_send(hass, SIGNAL_UPDATE_ENTITY.format(device_id))
-
-    # event_data = {
-    #    "device_id": device_id,
-    #    "type": data,
-    # }
-    # hass.bus.async_fire("thingbits_event", event_data)
 
 
 async def async_setup_entry(hass, config, async_add_entities):
@@ -32,20 +28,22 @@ async def async_setup_entry(hass, config, async_add_entities):
     entities = []
     for device in devices:
         if device["type"] in thingbits.BINARY_SENSOR_TYPES:
-            entities.append(DummyBinarySensor(device))
-            thingbits_ha.listen(device["id"], hass, send_event)
+            sensor = BinarySensor(device)
+            entities.append(sensor)
+            thingbits_ha.listen(device["id"], (hass, sensor), send_event)
 
     async_add_entities(entities)
 
 
-class DummyBinarySensor(BinarySensorEntity):
-    """Representation of a Dummy binary sensor."""
+class BinarySensor(BinarySensorEntity):
+    """Representation of a ThingBits binary sensor."""
 
     def __init__(self, data):
         """Initialize the sensor."""
         self.data = data
         self._state = None
         self._remove_signal_update = None
+        self.value = None
 
     async def async_added_to_hass(self):
         """Call when entity is added to hass."""
@@ -76,8 +74,8 @@ class DummyBinarySensor(BinarySensorEntity):
 
     async def async_update(self):
         """Update sensor state."""
-        print("updating")
-        self._state = not self._state  # await async_fetch_state()
+        print("updating binary state")
+        self._state = self.value
 
     def _update_callback(self):
         """Call update method."""
