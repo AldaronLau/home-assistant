@@ -6,13 +6,30 @@ from homeassistant.core import HomeAssistant
 
 from .const import DOMAIN
 
-# TODO List the platforms that you want to support.
 # For your initial PR, limit it to 1 platform.
-PLATFORMS = ["binary_sensor"]
+PLATFORMS = ["sensor", "binary_sensor"]
 
 
 class ThingBits:
     """The ThingBits class."""
+
+    # Binary Sensors
+    BINARY_SENSOR_TYPES = [
+        "DUMMY",
+        "Beacon",
+        "Button",
+        "Toggle",
+        "Tilt",
+        "Shake",
+        "Motion",
+        "Knock",
+        "Sound",
+        "Reed",
+        "Leak",
+    ]
+
+    # Sensors
+    SENSOR_TYPES = ["T,RH", "Light", "Temp"]
 
     def __init__(self):
         """Init ThingBits."""

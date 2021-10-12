@@ -2,7 +2,7 @@
 
 import thingbits_ha
 
-from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.components.sensor import SensorEntity
 from homeassistant.helpers.dispatcher import (
     async_dispatcher_connect,
     async_dispatcher_send,
@@ -31,15 +31,15 @@ async def async_setup_entry(hass, config, async_add_entities):
     devices = await hass.async_add_executor_job(thingbits_ha.devices)
     entities = []
     for device in devices:
-        if device["type"] in thingbits.BINARY_SENSOR_TYPES:
-            entities.append(DummyBinarySensor(device))
+        if device["type"] in thingbits.SENSOR_TYPES:
+            entities.append(Sensor(device))
             thingbits_ha.listen(device["id"], hass, send_event)
 
     async_add_entities(entities)
 
 
-class DummyBinarySensor(BinarySensorEntity):
-    """Representation of a Dummy binary sensor."""
+class Sensor(SensorEntity):
+    """Representation of a ThingBits sensor."""
 
     def __init__(self, data):
         """Initialize the sensor."""
@@ -68,11 +68,6 @@ class DummyBinarySensor(BinarySensorEntity):
     def name(self) -> str:
         """Return the name of the sensor."""
         return self.data["name"]
-
-    @property
-    def is_on(self):
-        """Return true if the binary sensor is on."""
-        return self._state
 
     async def async_update(self):
         """Update sensor state."""
