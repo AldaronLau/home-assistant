@@ -86,3 +86,31 @@ class Sensor(ThingbitsEntity, SensorEntity):
     def unique_id(self) -> str:
         """Return a unique ID."""
         return self.data["id"]
+
+    @property
+    def native_unit_of_measurement(self):
+        """Return the unit of measurement of this entity, if any."""
+        if self.data["type"] == "Light":
+            return "%"
+        elif self.data["type"] == "Sound":
+            return "V"
+        elif self.data["type"] == "T,RH":
+            return "°F"
+        elif self.data["type"] == "Temp":
+            return "°F"
+        else:
+            return None
+
+    @property
+    def icon(self):
+        """Icon to use in the frontend, if any."""
+        if self.data["type"] == "Light":
+            return "mdi:brightness-percent"
+        elif self.data["type"] == "Sound":
+            return "mdi:volume-source"
+        elif self.data["type"] == "T,RH":
+            return "mdi:water-percent"
+        elif self.data["type"] == "Temp":
+            return "mdi:thermometer"
+        else:
+            return None

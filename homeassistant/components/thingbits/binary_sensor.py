@@ -14,11 +14,28 @@ from .const import DOMAIN
 SIGNAL_UPDATE_ENTITY = "thingbits_{}"
 
 
+def decode_event(event_type, old_state, data):
+    """Convert ThingBits Named States To HA On/Off."""
+
+    if event_type in ["Dummy", "Beacon", "Button", "Shake", "Motion", "Knock"]:
+        return not old_state
+    elif event_type == "Toggle":
+        return data == "ON"
+    elif event_type == "Tilt":
+        return data == "UP"
+    elif event_type == "Reed":
+        return data == "OPEN"
+    elif event_type == "Leak":
+        return data == "WET"
+    else:
+        return None
+
+
 def send_event(device_id, user_data, data):
     """Send event to HomeAssistant from thingbits_ha (callback)."""
 
     hass, sensor = user_data
-    sensor.value = not sensor.value
+    sensor.value = decode_event(sensor.data["type"], sensor.value, data)
     async_dispatcher_send(hass, SIGNAL_UPDATE_ENTITY.format(device_id))
 
 
@@ -86,3 +103,36 @@ class BinarySensor(ThingbitsEntity, BinarySensorEntity):
     def unique_id(self) -> str:
         """Return a unique ID."""
         return self.data["id"]
+
+    @property
+    def icon(self):
+        """Icon to use in the frontend, if any."""
+        if self.data["type"] == "Dummy":
+            return "mdi:test-tube"
+        elif self.data["type"] == "Beacon":
+            if self._state:
+                return "mdi:lighthouse-on"
+            else:
+                return "mdi:lighthouse"
+        elif self.data["type"] == "Toggle":
+            if self._state:
+                return "mdi:toggle-switch"
+            else:
+                return "mdi:toggle-switch-off-outline"
+        elif self.data["type"] == "Tilt":
+            return "mdi:rotate-right-variant"
+        elif self.data["type"] == "Reed":
+            if self._state:
+                return "mdi:door-open"
+            else:
+                return "mdi:door-closed"
+        elif self.data["type"] == "Shake":
+            return "mdi:vibrate"
+        elif self.data["type"] == "Motion":
+            return "mdi:motion-sensor"
+        elif self.data["type"] == "Knock":
+            return "mdi:doorbell"
+        elif self.data["type"] == "Leak":
+            return "mdi:pipe-leak"
+        else:
+            return None
