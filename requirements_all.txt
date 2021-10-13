@@ -2305,7 +2305,7 @@ tesla-powerwall==0.3.11
 thermoworks_smoke==0.1.8
 
 # homeassistant.components.thingbits
-thingbits_ha==0.1.0
+thingbits-ha==0.1.0
 
 # homeassistant.components.thingspeak
 thingspeak==1.0.0

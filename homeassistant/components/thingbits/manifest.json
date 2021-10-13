@@ -3,7 +3,7 @@
   "name": "ThingBits",
   "config_flow": true,
   "documentation": "https://www.home-assistant.io/integrations/thingbits",
-  "requirements": ["thingbits_ha==0.1.0"],
+  "requirements": ["thingbits-ha==0.1.0"],
   "ssdp": [],
   "zeroconf": [],
   "homekit": {},
