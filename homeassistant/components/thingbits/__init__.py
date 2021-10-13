@@ -7,8 +7,7 @@ from homeassistant.helpers.entity import Entity
 
 from .const import DOMAIN
 
-# For your initial PR, limit it to 1 platform.
-PLATFORMS = ["sensor", "binary_sensor"]
+PLATFORMS = ["sensor"]
 
 
 class ThingBits:

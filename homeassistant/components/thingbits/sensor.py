@@ -75,7 +75,6 @@ class Sensor(ThingbitsEntity, SensorEntity):
 
     async def async_update(self):
         """Update sensor state."""
-        print("updating value")
         self._state = self.value
 
     def _update_callback(self):
