@@ -8,6 +8,7 @@ from homeassistant.helpers.dispatcher import (
     async_dispatcher_send,
 )
 
+from . import ThingbitsEntity
 from .const import DOMAIN
 
 SIGNAL_UPDATE_ENTITY = "thingbits_{}"
@@ -35,7 +36,7 @@ async def async_setup_entry(hass, config, async_add_entities):
     async_add_entities(entities)
 
 
-class BinarySensor(BinarySensorEntity):
+class BinarySensor(ThingbitsEntity, BinarySensorEntity):
     """Representation of a ThingBits binary sensor."""
 
     def __init__(self, data):
@@ -80,3 +81,8 @@ class BinarySensor(BinarySensorEntity):
     def _update_callback(self):
         """Call update method."""
         self.async_schedule_update_ha_state(True)
+
+    @property
+    def unique_id(self) -> str:
+        """Return a unique ID."""
+        return self.data["id"]

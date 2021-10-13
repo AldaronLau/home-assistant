@@ -3,6 +3,7 @@ from __future__ import annotations
 
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity import Entity
 
 from .const import DOMAIN
 
@@ -15,7 +16,7 @@ class ThingBits:
 
     # Binary Sensors
     BINARY_SENSOR_TYPES = [
-        "DUMMY",
+        "Dummy",
         "Beacon",
         "Button",
         "Toggle",
@@ -53,3 +54,17 @@ async def async_unload_entry(hass: HomeAssistant, entry: ConfigEntry) -> bool:
         hass.data[DOMAIN].pop(entry.entry_id)
 
     return unload_ok
+
+
+class ThingbitsEntity(Entity):
+    """Representation of a ThingBits sensor."""
+
+    @property
+    def device_info(self):
+        """Get attributes about the device."""
+        return {
+            "identifiers": {(DOMAIN, "thingbits.local")},
+            "name": "ThingBits Hub",
+            "model": "Hub",
+            "manufacturer": "ThingBits",
+        }
